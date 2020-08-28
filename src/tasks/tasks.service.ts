@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
+import { ApiQuery } from '@nestjs/swagger';
 import { CreateTaskDTO } from './dto/create-task.dto';
 import { GetTasksFilterDTO } from './dto/get-tasks-filter.dto';
 import { TaskRepository } from './task.repository';
@@ -13,6 +14,7 @@ export class TasksService {
     @InjectRepository(TaskRepository) private taskRepository: TaskRepository,
   ) {}
 
+  @ApiQuery({ name: 'filterDTO', type: GetTasksFilterDTO })
   async getTasks(filterDTO: GetTasksFilterDTO): Promise<Task[]> {
     const tasks = await this.taskRepository.getTasks(filterDTO);
 
