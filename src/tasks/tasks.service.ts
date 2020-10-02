@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { ApiQuery } from '@nestjs/swagger';
+import { PrintMessageProducer } from 'src/queues/producers/printMessage.producer';
 import { CreateTaskDTO } from './dto/create-task.dto';
 import { GetTasksFilterDTO } from './dto/get-tasks-filter.dto';
 import { TaskRepository } from './task.repository';
@@ -12,11 +13,14 @@ import { TaskStatus } from './task-status.enum';
 export class TasksService {
   constructor(
     @InjectRepository(TaskRepository) private taskRepository: TaskRepository,
+    private printMessageProducer: PrintMessageProducer,
   ) {}
 
   @ApiQuery({ name: 'filterDTO', type: GetTasksFilterDTO })
   async getTasks(filterDTO: GetTasksFilterDTO): Promise<Task[]> {
     const tasks = await this.taskRepository.getTasks(filterDTO);
+
+    await this.printMessageProducer.printMessage('getTasksRoute');
 
     return tasks;
   }
